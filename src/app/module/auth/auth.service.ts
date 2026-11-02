@@ -12,6 +12,7 @@ import type {
 	IRequestUser,
 } from "./auth.interface";
 import { OAuth2Client } from "google-auth-library";
+import { googleClient } from "../../lib/googleAuth";
 
 
 const registerPatient = async (payload: IRegisterPatientPayload) => {
@@ -195,7 +196,17 @@ const refreshToken = async (token: string) => {
 // google login--
 const googleLogin = async (payload : IGoogleLoginPayload) =>{
 
-	const googleClient = new OAuth2Client()
+	// const googleClient = new OAuth2Client({
+	// 	client_id: config.google_client_id
+	// })
+
+	// const result = await googleClient.verifyIdToken({
+	// 	idToken: payload.idToken
+	// })
+
+	// const googleInfo = result.getPayload()
+
+	return []
 
 }
 
@@ -210,3 +221,4 @@ export const AuthService = {
 	refreshToken,
 	googleLogin
 };
+
