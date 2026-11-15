@@ -13,6 +13,7 @@ import type {
 } from "./auth.interface";
 import { OAuth2Client, TokenPayload } from "google-auth-library";
 import { googleClient } from "../../lib/googleAuth";
+import { error } from "node:console";
 
 
 const registerPatient = async (payload: IRegisterPatientPayload) => {
@@ -248,7 +249,87 @@ const googleLogin = async (payload : IGoogleLoginPayload) =>{
 
 	let user = ifPatientExistWithGoogleAuth
 
-	if(!user){
+	if(!ifPatientExistWithGoogleAuth){
+
+	const ifPatientExistWithCredentials = await prisma.user.findUnique({
+		where: {
+			email: googleIdTokenPayload.email,
+			role: Role.PATIENT,
+			authProvider: AuthProvider.CREDENTIAL
+
+		}
+	})
+
+	if(ifPatientExistWithCredentials){
+
+		if(!ifPatientExistWithCredentials.emailVerified){
+
+			throw new Error("Email is not varfied ")
+
+		}
+
+
+
+
+		if(ifPatientExistWithCredentials.status === UserStatus.BLOCKED){
+			throw new Error("user is blocked")
+		}
+
+
+		if(ifPatientExistWithCredentials.isDeleted || ifPatientExistWithCredentials.status === UserStatus.DELETED){
+			throw new Error ("user is deleted")
+		}
+
+		user = await prisma.user.update({
+			where: {
+				id:	 ifPatientExistWithCredentials.id
+			},
+			data:{
+				googleId: googleIdTokenPayload.sub,
+			}
+		})
+
+
+
+	}else {
+
+		// if google account is not in the database then the user should register 
+		user = await prisma.user.create({
+			data : {
+				name: googleIdTokenPayload.name,
+				email : googleIdTokenPayload.email,
+				role: Role.PATIENT,
+				googleId: googleIdTokenPayload.sub,
+				authProvider : AuthProvider.GOOGLE,
+				emailVerified: true,
+				patient : {
+					create : {
+						name: googleIdTokenPayload.name,
+						email : googleIdTokenPayload.email,
+					}
+				}
+			}
+		})
+		 
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 		// throw new Error (" user not found")
 		user = await prisma.user.create({
 			data : {
@@ -257,6 +338,7 @@ const googleLogin = async (payload : IGoogleLoginPayload) =>{
 				role: Role.PATIENT,
 				googleId: googleIdTokenPayload.sub,
 				authProvider : AuthProvider.GOOGLE,
+				emailVerified: true,
 				patient : {
 					create : {
 						name: googleIdTokenPayload.name,
@@ -266,6 +348,28 @@ const googleLogin = async (payload : IGoogleLoginPayload) =>{
 			}
 		})
 	}
+
+	if(!user){
+		throw new Error("user is not found ")
+	}
+
+	if(user.status === UserStatus.BLOCKED){
+		throw new Error ("user is blocked")
+	}
+
+	if(user.isDeleted || user.status === UserStatus.DELETED){
+		throw new Error("user is deleted")
+	}
+
+
+
+
+
+
+
+
+
+
 
 	const jwtPayload = {
 		userId: user.id,
