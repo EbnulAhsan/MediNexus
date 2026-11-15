@@ -256,7 +256,13 @@ const googleLogin = async (payload : IGoogleLoginPayload) =>{
 				email : googleIdTokenPayload.email,
 				role: Role.PATIENT,
 				googleId: googleIdTokenPayload.sub,
-				authProvider : AuthProvider.GOOGLE
+				authProvider : AuthProvider.GOOGLE,
+				patient : {
+					create : {
+						name: googleIdTokenPayload.name,
+						email : googleIdTokenPayload.email,
+					}
+				}
 			}
 		})
 	}
