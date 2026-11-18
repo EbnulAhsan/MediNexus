@@ -1,6 +1,7 @@
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import express, {
+	NextFunction,
 	type Application,
 	type Request,
 	type Response,
@@ -10,6 +11,7 @@ import config from "./app/config";
 import { globalErrorHandler } from "./app/middleware/globalErrorHandler";
 import { notFound } from "./app/middleware/notFound";
 import { AuthRoutes } from "./app/module/auth/auth.route";
+import z from "zod";
 
 const app: Application = express();
 
@@ -28,6 +30,45 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use("/api/v1/auth", AuthRoutes);
+
+// building zod function
+
+app.post("/zod", async (req: Request, res: Response, next: NextFunction) => {
+
+	try {
+		const UserZodSchema = z.object({
+			name: z.string(),
+			age: z.number(),
+			isVerified: z.boolean(),
+			books: z.array(z.string()),
+
+		})
+
+		const payload = req.body
+
+		// now zod schema validation
+
+		const result = UserZodSchema.parse(payload)
+
+		console.log(result)
+
+		res.status(httpStatus.OK).json({
+			success: true,
+			message: "Welcome to MediNexus Healthcare System Backend",
+			data: result
+		});
+	} catch (error) {
+		console.log(error)
+		next(error)
+
+	}
+
+})
+
+
+
+
+
 
 // Basic route
 app.get("/", async (req: Request, res: Response) => {
