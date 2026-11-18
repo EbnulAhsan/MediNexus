@@ -11,7 +11,7 @@ import config from "./app/config";
 import { globalErrorHandler } from "./app/middleware/globalErrorHandler";
 import { notFound } from "./app/middleware/notFound";
 import { AuthRoutes } from "./app/module/auth/auth.route";
-import z from "zod";
+import z, { email } from "zod";
 
 const app: Application = express();
 
@@ -38,15 +38,16 @@ app.post("/zod", async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const UserZodSchema = z.object({
 			name: z.string(),
-			age: z.number(),
-			isVerified: z.boolean(),
-			books: z.array(z.string()),
+			email: z.email(),
+			age: z.number().optional(),
+			isVerified: z.boolean().optional(),
+			books: z.array(z.string()).optional(),
 
 		})
 
 		const payload = req.body
 
-		// now zod schema validation
+		// now zod schema validation and sanitization
 
 		const result = UserZodSchema.parse(payload)
 
