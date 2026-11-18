@@ -116,10 +116,9 @@ const refreshToken = catchAsync(async (req: Request, res: Response) => {
 // google login ----
 
 const googleLogin = catchAsync(async (req: Request, res: Response) => {
+	const payload = req.body;
 
-	const payload = req.body
-
-	const result = await AuthService.googleLogin(payload)
+	const result = await AuthService.googleLogin(payload);
 
 	const { accessToken, refreshToken } = result;
 
@@ -136,7 +135,6 @@ const googleLogin = catchAsync(async (req: Request, res: Response) => {
 		maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
 	});
 
-
 	sendResponse(res, {
 		statusCode: httpStatus.OK,
 		success: true,
@@ -144,20 +142,14 @@ const googleLogin = catchAsync(async (req: Request, res: Response) => {
 		data: {
 			accessToken,
 			refreshToken,
-
-		}
-
+		},
 	});
 });
-
-
-
-
 
 export const AuthController = {
 	registerPatient,
 	loginUser,
 	getMe,
 	refreshToken,
-	googleLogin
+	googleLogin,
 };
