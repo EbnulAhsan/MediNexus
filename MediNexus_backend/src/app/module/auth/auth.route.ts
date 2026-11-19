@@ -2,57 +2,54 @@ import { NextFunction, Request, Response, Router } from "express";
 import { Role } from "../../../generated/prisma/enums";
 import { auth } from "../../middleware/checkAuth";
 import { AuthController } from "./auth.controller";
-import { PatientValidation } from "./auth.validation";
+import { UserValidation } from "./auth.validation";
+import { catchAsync } from "../../utils/catchAsync";
+import z from "zod";
+import { validateRequest } from "../../middleware/validateRequest";
 
 const router = Router();
 
+
+
+
+
 router.post("/register",
 
-	(req: Request, _res: Response, next: NextFunction) => {
+	// (req: Request, _res: Response, next: NextFunction) => {
 
-		try {
+	// 	// try {
 
-			const payload = req.body ?? {}
+	// 	// 	const payload = req.body ?? {}
 
-			const result = PatientValidation.PatientRegistrationZodSchema.safeParse(payload)
+	// 	// 	const result = PatientValidation.PatientRegistrationZodSchema.safeParse(payload)
 
-			if (!result.success) {
-				console.log(result.error)
-				console.log(result.error.issues)
+	// 	// 	if (!result.success) {
+	// 	// 		console.log(result.error)
+	// 	// 		console.log(result.error.issues)
 
-				throw new Error(result.error.issues[0].message)
-			}
+	// 	// 		throw new Error(result.error.issues[0].message)
+	// 	// 	}
 
-			req.body = result.data
-
-
-			next()
-
-		} catch (error) {
-			next(error)
-		}
+	// 	// 	req.body = result.data
 
 
+	// 	// 	next()
+
+	// 	// } catch (error) {
+	// 	// 	next(error)
+	// 	// }
 
 
+	// },
 
 
-	},
-
-
-
-
-
-
-
-
-
-
-
-
+	validateRequest(UserValidation.PatientRegistrationZodSchema),
 	AuthController.registerPatient);
 
-router.post("/login", AuthController.loginUser);
+
+router.post("/login",
+	validateRequest(UserValidation.LoginZodSchema),
+	AuthController.loginUser);
 
 router.post("/google", AuthController.googleLogin);
 
