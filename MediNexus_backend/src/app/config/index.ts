@@ -41,15 +41,20 @@ export default {
 
 	super_admin_password: process.env.SUPER_ADMIN_PASSWORD!,
 
-	tester_admin_name: process.env.TESTER_ADMIN_NAME || "Tester Admin 1",
+	tester_admin_name: process.env.TESTER_ADMIN_NAME,
 
-	tester_admin_email: process.env.TESTER_ADMIN_EMAIL || "testeradmin@gmail.com",
+	tester_admin_email: process.env.TESTER_ADMIN_EMAIL,
 
-	tester_admin_password: process.env.TESTER_ADMIN_PASSWORD || "Tester@admin12345",
+	tester_admin_password: process.env.TESTER_ADMIN_PASSWORD,
 
-	tester_doctor_name: process.env.TESTER_DOCTOR_NAME || "Tester Doctor 1",
+	tester_doctor_name: process.env.TESTER_DOCTOR_NAME,
 
-	tester_doctor_email: process.env.TESTER_DOCTOR_EMAIL || "testerdoctor@gmail.com",
+	tester_doctor_email: process.env.TESTER_DOCTOR_EMAIL,
 
-	tester_doctor_password: process.env.TESTER_DOCTOR_PASSWORD || "Tester@doctor12345"
+	tester_doctor_password: process.env.TESTER_DOCTOR_PASSWORD,
+
+	redis_user: process.env.REDIS_USER!,
+	redis_password: process.env.REDIS_PASSWORD!,
+	redis_host: process.env.REDIS_HOST!,
+	redis_port: process.env.REDIS_PORT!,
 };

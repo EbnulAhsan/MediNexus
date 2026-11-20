@@ -12,6 +12,8 @@ import { globalErrorHandler } from "./app/middleware/globalErrorHandler";
 import { notFound } from "./app/middleware/notFound";
 import { AuthRoutes } from "./app/module/auth/auth.route";
 import z, { email } from "zod";
+import { RedisSentinel } from "redis";
+import { redisClient } from "./app/lib/redis";
 
 const app: Application = express();
 
@@ -33,30 +35,23 @@ app.use("/api/v1/auth", AuthRoutes);
 
 // building zod function
 
-app.post("/zod", async (req: Request, res: Response, next: NextFunction) => {
+app.get("/test", async (req: Request, res: Response, next: NextFunction) => {
 
 	try {
-		const UserZodSchema = z.object({
-			name: z.string(),
-			email: z.email(),
-			age: z.number().optional(),
-			isVerified: z.boolean().optional(),
-			books: z.array(z.string()).optional(),
-
+		await redisClient.set("forgot-password-otp:patient1@gmail.com", "123456", {
+			expiration: {
+				type: "EX",
+				value: 5 * 60,
+			}
 		})
 
-		const payload = req.body
 
-		// now zod schema validation and sanitization
 
-		const result = UserZodSchema.parse(payload)
-
-		console.log(result)
 
 		res.status(httpStatus.OK).json({
 			success: true,
 			message: "Welcome to MediNexus Healthcare System Backend",
-			data: result
+			data: null
 		});
 	} catch (error) {
 		console.log(error)
